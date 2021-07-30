@@ -34,6 +34,15 @@ server.post("/register",(request,resond)=>{
     resond.json(users);
 });
 
+server.get("/device/:id/:device_name",(req,res)=>{
+    let foundIndex=users.findIndex(u=>(u.id===req.params.id && u.device_name===req.params.device_name));
+    if(!foundIndex){
+        res.respond(404).json({errorMessage:"User was not found"});
+    }else{
+        res.redirect(users[foundIndex].api);
+    }
+});
+
 // server.put("/update/:id",(req,res)=>{
 //     let foundItem=users.findIndex(u=>u.id===req.params.id);
 //     if(!foundItem){
