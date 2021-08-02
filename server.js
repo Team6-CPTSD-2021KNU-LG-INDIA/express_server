@@ -1,5 +1,6 @@
 const express =require('express');
 const bodyparser=require('body-parser');
+const request_ip=require('request-ip');
 
 const server=express();
 server.use(bodyparser.json());
@@ -28,10 +29,19 @@ server.get("/list/:id",(request,respond)=>{
     }
 });
 
-server.post("/register",(request,resond)=>{
+server.post("/register",(request,respond)=>{
+    const device_ip=request_ip.getClientIp(request);
+    const ip=device_ip.split(':');
+    
+    const device_info=request.body.api='http://'+ip[3]+':'+request.body.port+'/'+request.body.function;
+
+    delete request.body.port;
+    delete request.body.function;
+    request.body.api=device_info;
     users.push(request.body);
     console.log(request.body);
-    resond.json(users);
+    
+    respond.json(users);
 });
 
 server.get("/device/:id/:device_name",(req,res)=>{
@@ -41,6 +51,11 @@ server.get("/device/:id/:device_name",(req,res)=>{
     }else{
         res.redirect(users[foundIndex].api);
     }
+});
+
+server.get("/testIp",(req,res)=>{
+    console.log("client-IP: "+request_ip.getClientIp(req));
+    res.send('test');
 });
 
 // server.put("/update/:id",(req,res)=>{
